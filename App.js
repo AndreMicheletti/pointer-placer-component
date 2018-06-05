@@ -1,28 +1,50 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import PointerPlacerView from './src/PointerPlacerView';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, View, StatusBar } from 'react-native';
+import { createBottomTabNavigator, createStackNavigator } from 'react-navigation';
+import { HomeScreen, MyTeamScreen, SearchTeamScreen } from './src/screens';
 
 const pointerImage = require('./src/assets/pointer.png')
 
-export default class App extends React.Component {
+export default class App extends React.PureComponent {
 
   render() {
-    return (
-      <View style={styles.container}>
-        <PointerPlacerView
-          pointerImage={pointerImage}
-          pointerSize={48}
-        />
-      </View>
-    );
-  }
-}
+    const RootNavigator = createBottomTabNavigator({
+      home: { screen: HomeScreen },
+      team: createStackNavigator({
+        myTeam: { screen: MyTeamScreen },
+        searchTeam: { screen: SearchTeamScreen }
+      }),
+    }, {
+      navigationOptions: ({ navigation }) => ({
+        tabBarIcon: ({ focused, tintColor }) => {
+          const { routeName } = navigation.state;
+          let iconName;
+          if (routeName === 'home') {
+            iconName = `ios-information-circle${focused ? '' : '-outline'}`;
+          } else if (routeName === 'team') {
+            iconName = `ios-options${focused ? '' : '-outline'}`;
+          }
+          return <Ionicons name={iconName} size={25} color={tintColor} />;
+        },
+      }),
+      tabBarOptions: {
+        activeTintColor: 'tomato',
+        inactiveTintColor: 'white',
+        style: {
+          backgroundColor: '#333',
+        },
+      },
+    })
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    return (
+      <View style={rootStyle}>
+        <RootNavigator />
+      </View>
+    )
+  }
+};
+
+const rootStyle = {
+  flex: 1
+};
